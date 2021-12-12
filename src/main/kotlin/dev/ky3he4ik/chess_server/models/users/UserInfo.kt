@@ -9,12 +9,12 @@ import java.util.*
 import javax.persistence.*
 
 @Entity
-@Table(name = "problem_info")
+@Table(name = "user_info")
 @Serializable
 class UserInfo {
     @Id
     @GeneratedValue
-    @Column(name = "user_id", nullable = false)
+    @Column(name = "userId", nullable = false)
     @Serializable(with = UUIDSerializer::class)
     val userId: UUID? = null
 
@@ -33,7 +33,7 @@ class UserInfo {
     @Column
     var mail: String = ""
 
-    @OneToMany(mappedBy = "user_id",  cascade = [CascadeType.ALL], fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "userId",  cascade = [CascadeType.ALL], fetch = FetchType.EAGER)
     @OnDelete(action = OnDeleteAction.CASCADE)
     var solvedProblems: List<SolvedProblem> = ArrayList()
 }

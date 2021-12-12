@@ -9,12 +9,12 @@ import javax.persistence.*
 
 
 @Entity
-@Table(name = "problem_info")
+@Table(name = "problemInfo")
 @Serializable
 class ProblemInfo {
     @Id
     @GeneratedValue
-    @Column(name = "problem_id", nullable = false)
+    @Column(name = "problemId", nullable = false)
     @Serializable(with = UUIDSerializer::class)
     var problemId: UUID? = null
 
@@ -27,14 +27,14 @@ class ProblemInfo {
     @Column
     var difficulty: Int = 0
 
-    @Column(name = "white_starts")
+    @Column(name = "whiteStarts")
     var whiteStarts: Boolean = false
 
-    @OneToMany(mappedBy = "problem_id",  cascade = [CascadeType.ALL], fetch = FetchType.EAGER, targetEntity = ProblemMove::class)
+    @OneToMany(mappedBy = "problemId",  cascade = [CascadeType.ALL], targetEntity = ProblemMove::class)
     @OnDelete(action = OnDeleteAction.CASCADE)
     var moves: List<ProblemMove> = ArrayList()
 
-    @OneToMany(mappedBy = "problem_id",  cascade = [CascadeType.ALL], fetch = FetchType.EAGER, targetEntity = FigurePosition::class)
+    @OneToMany(mappedBy = "problemId",  cascade = [CascadeType.ALL], targetEntity = FigurePosition::class)
     @OnDelete(action = OnDeleteAction.CASCADE)
     var figurePosition: List<FigurePosition> = ArrayList()
 }

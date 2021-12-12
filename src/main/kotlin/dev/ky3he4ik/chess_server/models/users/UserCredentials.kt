@@ -11,7 +11,7 @@ class UserCredentials {
     @Id
     @GeneratedValue
     @Column
-    var id: UUID? = null
+    var userId: UUID? = null
 
     @Column(nullable = false)
     var login: String? = null
@@ -26,9 +26,9 @@ class UserCredentials {
     val role: Role = Role.USER
 
     @OneToOne
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "userId", nullable = false)
     @JsonManagedReference
-    var person: UserInfo? = null
+    var user: UserInfo? = null
 
 
     enum class Role {

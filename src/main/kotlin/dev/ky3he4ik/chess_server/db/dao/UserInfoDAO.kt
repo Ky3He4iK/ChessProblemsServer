@@ -8,5 +8,5 @@ import java.util.*
 
 @Repository
 interface UserInfoDAO : JpaRepository<UserInfo?, UUID?> {
-    fun findByIdLike(id: UUID?): UserInfo?
+    fun findByUserIdLike(id: UUID?): UserInfo?
 }

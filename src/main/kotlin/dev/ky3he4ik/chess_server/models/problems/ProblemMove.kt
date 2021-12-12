@@ -1,10 +1,12 @@
 package dev.ky3he4ik.chess_server.models.problems
 
+import dev.ky3he4ik.chess_server.util.UUIDSerializer
 import kotlinx.serialization.Serializable
+import java.util.*
 import javax.persistence.*
 
 @Entity
-@Table(name = "problem_move")
+@Table(name = "problemMove")
 @Serializable
 class ProblemMove {
     @Id
@@ -12,25 +14,26 @@ class ProblemMove {
     @Column(nullable = false)
     var id: Int? = null
 
-    @Column(name = "problem_id")
-    var problem_id: Int = 0
+    @Column(name = "problemId", nullable = false)
+    @Serializable(with = UUIDSerializer::class)
+    var problemId: UUID? = null
 
-    @Column(name = "letter_start")
+    @Column(name = "letterStart")
     var letterStart: Int = 0
 
-    @Column(name = "number_start")
+    @Column(name = "numberStart")
     var numberStart: Int = 0
 
-    @Column(name = "letter_end")
+    @Column(name = "letterEnd")
     var letterEnd: Int = 0
 
-    @Column(name = "number_end")
+    @Column(name = "numberEnd")
     var numberEnd: Int = 0
 
     @Column
     var promotion: Char? = null
 
-    @Column(name = "is_castling")
+    @Column(name = "isCastling")
     var isCastling: Boolean = false
 
     @Column

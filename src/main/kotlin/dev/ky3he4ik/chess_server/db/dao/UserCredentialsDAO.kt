@@ -5,7 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository
 import java.util.*
 
 interface UserCredentialsDAO : JpaRepository<UserCredentials?, UUID?> {
-    fun findByIdLike(id: UUID?): UserCredentials?
+    fun findByUserIdLike(id: UUID?): UserCredentials?
     fun findByLoginLike(login: String?): UserCredentials?
     fun existsByLoginLike(login: String?): Boolean?
 }

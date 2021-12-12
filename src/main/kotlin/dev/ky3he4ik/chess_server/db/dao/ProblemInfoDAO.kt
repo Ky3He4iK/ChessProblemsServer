@@ -7,5 +7,5 @@ import java.util.*
 
 @Repository
 interface ProblemInfoDAO : JpaRepository<ProblemInfo?, UUID?> {
-    fun findByIdLike(id: UUID?): ProblemInfo?
+    fun findByProblemIdLike(problemId: UUID?): ProblemInfo?
 }

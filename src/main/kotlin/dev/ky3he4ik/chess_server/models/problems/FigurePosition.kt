@@ -1,10 +1,12 @@
 package dev.ky3he4ik.chess_server.models.problems
 
+import dev.ky3he4ik.chess_server.util.UUIDSerializer
 import kotlinx.serialization.Serializable
+import java.util.*
 import javax.persistence.*
 
 @Entity
-@Table(name = "figure_position")
+@Table(name = "figurePosition")
 @Serializable
 class FigurePosition {
     @Id
@@ -12,8 +14,13 @@ class FigurePosition {
     @Column(nullable = false)
     var id: Int? = null
 
-    @Column(name = "problem_id")
-    var problemId: Int = 0
+    @Column(name = "problemId", nullable = false)
+    @Serializable(with = UUIDSerializer::class)
+    var problemId: UUID? = null
+
+//    @ManyToOne(cascade = [CascadeType.ALL], optional = false)
+//    @JoinColumn(name = "problemId", referencedColumnName = "problemId", nullable = false)
+//    var problemInfo: ProblemInfo = ProblemInfo()
 
     @Column
     var letter: Char = '0'
