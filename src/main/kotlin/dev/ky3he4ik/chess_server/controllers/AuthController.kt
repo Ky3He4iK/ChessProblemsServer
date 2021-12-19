@@ -5,9 +5,11 @@ import dev.ky3he4ik.chess_server.db.dao.UserInfoDAO
 import dev.ky3he4ik.chess_server.models.users.UserCredentials
 import dev.ky3he4ik.chess_server.models.users.UserInfo
 import dev.ky3he4ik.chess_server.security.JwtUtils
+import dev.ky3he4ik.chess_server.service.RefreshTokenService
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.ResponseEntity
+import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.BadCredentialsException
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.Authentication
@@ -17,17 +19,16 @@ import java.util.*
 
 @RestController
 @RequestMapping("auth")
-class AuthController {
+class AuthController(
+    val jwtUtils: JwtUtils,
+    val userCredentialsDAO: UserCredentialsDAO,
+    val userInfoDAO: UserInfoDAO,
+    var refreshTokenService: RefreshTokenService,
+) {
     private var passwordEncoder = BCryptPasswordEncoder()
 
     @Autowired
-    private lateinit var jwtUtils: JwtUtils
-
-    @Autowired
-    private lateinit var userCredentialsDAO: UserCredentialsDAO
-
-    @Autowired
-    private lateinit var userInfoDAO: UserInfoDAO
+    private lateinit var authenticationManager: AuthenticationManager
 
     @PostMapping("login")
     @Throws(Exception::class)
@@ -85,7 +86,10 @@ class AuthController {
      */
     private fun login(login: String, password: String): String? {
         return try {
-//            authenticationManager.authenticate(UsernamePasswordAuthenticationToken(login, password))
+            authenticationManager.authenticate(UsernamePasswordAuthenticationToken(login, password))
+            val token = jwtUtils.generateToken(login)
+            val refreshToken: RefreshToken =
+                refreshTokenService.createRefreshToken(login)
 //            jwtUtils.generateToken(userDetailsService.loadUserByUsername(login) ?: return null)
             null
         } catch (e: BadCredentialsException) {

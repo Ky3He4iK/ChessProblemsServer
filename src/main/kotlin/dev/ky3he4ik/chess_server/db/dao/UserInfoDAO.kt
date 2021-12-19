@@ -13,4 +13,6 @@ interface UserInfoDAO : JpaRepository<UserInfo?, UUID?> {
 
     @Query("select u from UserInfo u where u.userId = (select c.userId from UserCredentials c where c.login = :userName)")
     fun findByUserName(@Param("userName") userName: String?): UserInfo?
+
+    fun findUserEntityByMail(mail: String): UserInfo?
 }
