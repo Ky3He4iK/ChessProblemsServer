@@ -17,7 +17,7 @@ class DbInit @Autowired constructor(
 
 
     @Autowired
-    fun DataInit(
+    fun dataInit(
         problemInfoDAO: ProblemInfoDAO,
         userInfoDAO: UserInfoDAO,
         passwordEncoder: PasswordEncoder,

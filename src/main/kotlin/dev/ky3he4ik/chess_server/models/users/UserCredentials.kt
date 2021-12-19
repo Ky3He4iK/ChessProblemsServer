@@ -7,30 +7,22 @@ import javax.persistence.*
 
 @Entity
 @Table(name = "user_credentials")
-class UserCredentials {
+class UserCredentials(
     @Id
     @GeneratedValue
     @Column
-    var userId: UUID? = null
-
+    var userId: UUID? = null,
     @Column(nullable = false)
-    var login: String? = null
-
+    var login: String? = null,
     @Column(nullable = false)
-    var password: String? = null
-
-    @Column(nullable = false)
-    var salt: String? = null
-
+    var password: String? = null,
     @Column
-    val role: Role = Role.USER
-
+    var role: Role = Role.USER,
     @OneToOne
     @JoinColumn(name = "userId", nullable = false)
     @JsonManagedReference
-    var user: UserInfo? = null
-
-
+    var user: UserInfo = UserInfo()
+) {
     enum class Role {
         ADMIN, MODERATOR, PREMIUM, USER
     }

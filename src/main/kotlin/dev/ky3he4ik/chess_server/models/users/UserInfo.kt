@@ -1,6 +1,5 @@
 package dev.ky3he4ik.chess_server.models.users
 
-import dev.ky3he4ik.chess_server.models.problems.ProblemMove
 import dev.ky3he4ik.chess_server.util.UUIDSerializer
 import kotlinx.serialization.Serializable
 import org.hibernate.annotations.OnDelete
@@ -33,7 +32,7 @@ class UserInfo {
     @Column
     var mail: String = ""
 
-    @OneToMany(mappedBy = "userId",  cascade = [CascadeType.ALL], fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "userId", cascade = [CascadeType.ALL], fetch = FetchType.EAGER)
     @OnDelete(action = OnDeleteAction.CASCADE)
     var solvedProblems: List<SolvedProblem> = ArrayList()
 }

@@ -2,7 +2,6 @@ package dev.ky3he4ik.chess_server.models.users
 
 import dev.ky3he4ik.chess_server.models.problems.ProblemInfo
 import dev.ky3he4ik.chess_server.util.UUIDSerializer
-import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
 import java.util.*
 import javax.persistence.*
@@ -14,7 +13,7 @@ class SolvedProblem {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column
-    var id: Int? = null
+    var id: Long? = null
 //    @Column(name = "problem_id", nullable = false)
 //    @ForeignKey(value = ConstraintMode.CONSTRAINT)
 //    @Id
@@ -26,7 +25,7 @@ class SolvedProblem {
 //    )
 //    @OnDelete(action = OnDeleteAction.NO_ACTION)
     @ManyToOne(cascade = [CascadeType.DETACH], optional = false)
-    @JoinColumn(name = "probleIid", referencedColumnName = "problemId", nullable = false)
+    @JoinColumn(name = "problemId", referencedColumnName = "problemId", nullable = false)
     var problemInfo: ProblemInfo = ProblemInfo()
 
 //    @Column(name = "userId", nullable = false)

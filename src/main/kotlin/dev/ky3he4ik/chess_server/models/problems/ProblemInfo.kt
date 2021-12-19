@@ -11,30 +11,31 @@ import javax.persistence.*
 @Entity
 @Table(name = "problemInfo")
 @Serializable
-class ProblemInfo {
+class ProblemInfo (
     @Id
     @GeneratedValue
     @Column(name = "problemId", nullable = false)
     @Serializable(with = UUIDSerializer::class)
-    var problemId: UUID? = null
+    var problemId: UUID? = null,
+
+    @Column(nullable = true)
+    @Serializable(with = UUIDSerializer::class)
+    var authorId: UUID? = null,
 
     @Column
-    var title: String = ""
+    var title: String = "",
 
     @Column
-    var description: String = ""
-
-    @Column
-    var difficulty: Int = 0
+    var difficulty: Int = 0,
 
     @Column(name = "whiteStarts")
-    var whiteStarts: Boolean = false
+    var whiteStarts: Boolean = false,
 
     @OneToMany(mappedBy = "problemId",  cascade = [CascadeType.ALL], targetEntity = ProblemMove::class)
     @OnDelete(action = OnDeleteAction.CASCADE)
-    var moves: List<ProblemMove> = ArrayList()
+    var moves: List<ProblemMove> = ArrayList(),
 
     @OneToMany(mappedBy = "problemId",  cascade = [CascadeType.ALL], targetEntity = FigurePosition::class)
     @OnDelete(action = OnDeleteAction.CASCADE)
-    var figurePosition: List<FigurePosition> = ArrayList()
-}
+    var figurePosition: List<FigurePosition> = ArrayList(),
+)

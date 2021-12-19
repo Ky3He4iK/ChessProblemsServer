@@ -8,29 +8,25 @@ import javax.persistence.*
 @Entity
 @Table(name = "figurePosition")
 @Serializable
-class FigurePosition {
+class FigurePosition(
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(nullable = false)
-    var id: Int? = null
+    var id: Long? = null,
 
     @Column(name = "problemId", nullable = false)
     @Serializable(with = UUIDSerializer::class)
-    var problemId: UUID? = null
-
-//    @ManyToOne(cascade = [CascadeType.ALL], optional = false)
-//    @JoinColumn(name = "problemId", referencedColumnName = "problemId", nullable = false)
-//    var problemInfo: ProblemInfo = ProblemInfo()
+    var problemId: UUID? = null,
 
     @Column
-    var letter: Char = '0'
+    var letter: Char = '0',
 
     @Column
-    var number: Int = 0
+    var number: Int = 0,
 
     @Column
-    var figure: Char? = null
+    var figure: Char? = null,
 
     @Column
-    var isWhite: Boolean = false
-}
+    var isWhite: Boolean = false,
+)

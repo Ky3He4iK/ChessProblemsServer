@@ -1,6 +1,5 @@
-package dev.ky3he4ik.chess_server.security.services
+package dev.ky3he4ik.chess_server.security
 
-import dev.ky3he4ik.chess_server.models.users.UserCredentials
 import io.jsonwebtoken.Claims
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.SignatureAlgorithm
@@ -9,28 +8,25 @@ import org.springframework.stereotype.Service
 import java.util.*
 import java.util.function.Function
 
+
 @Service
-class JWTUtils {
+class JwtUtils {
     private val SECRET_KEY = "secret"
     fun extractUsername(token: String?): String {
-        return extractClaim(token, Function<Claims, String> { obj: Claims -> obj.getSubject() })
+        return extractClaim(token) { obj: Claims -> obj.subject }
     }
 
     fun extractExpiration(token: String?): Date {
-        return extractClaim(token, Function<Claims, Date> { obj: Claims -> obj.getExpiration() })
-    }
-
-    fun extractRole(token: String?): UserCredentials.Role {
-        return UserCredentials.Role.valueOf(extractAllClaims(token).get("role", String::class.java))
+        return extractClaim(token) { obj: Claims -> obj.expiration }
     }
 
     fun <T> extractClaim(token: String?, claimsResolver: Function<Claims, T>): T {
-        val claims: Claims = extractAllClaims(token)
+        val claims = extractAllClaims(token)
         return claimsResolver.apply(claims)
     }
 
     private fun extractAllClaims(token: String?): Claims {
-        return Jwts.parser().setSigningKey(SECRET_KEY).parseClaimsJws(token).getBody()
+        return Jwts.parser().setSigningKey(SECRET_KEY).parseClaimsJws(token).body
     }
 
     private fun isTokenExpired(token: String?): Boolean {
@@ -38,8 +34,8 @@ class JWTUtils {
     }
 
     fun generateToken(userDetails: UserDetails): String {
-        val claims: MutableMap<String, Any> = HashMap<String, Any>()
-        claims.put("role", userDetails.authorities.iterator().next().authority)
+        val claims: MutableMap<String, Any> = HashMap()
+        claims["role"] = userDetails.authorities.iterator().next().authority
         return createToken(claims, userDetails.username)
     }
 
@@ -53,8 +49,7 @@ class JWTUtils {
             .compact()
     }
 
-    fun validateToken(token: String?, userDetails: UserDetails?): Boolean {
-        userDetails ?: return false
+    fun validateToken(token: String?, userDetails: UserDetails): Boolean {
         val username = extractUsername(token)
         return username == userDetails.username && !isTokenExpired(token)
     }
