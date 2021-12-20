@@ -20,5 +20,5 @@ interface ProblemInfoDAO : JpaRepository<ProblemInfo?, UUID?> {
         limit :count
     """
     )
-    fun getRandomINotSolvedIds(@Param("user_id") userId: UUID, @Param("count") count: Int = 1): List<Int>
+    fun getRandomINotSolvedIds(@Param("user_id") userId: UUID, @Param("count") count: Int = 1): List<UUID>
 }

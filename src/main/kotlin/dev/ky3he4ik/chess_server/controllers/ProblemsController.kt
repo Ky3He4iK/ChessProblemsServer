@@ -1,85 +1,79 @@
 package dev.ky3he4ik.chess_server.controllers
-//
-//import dev.ky3he4ik.chess_server.db.dao.ProblemInfoDAO
-//import dev.ky3he4ik.chess_server.db.dao.UserCredentialsDAO
-//import dev.ky3he4ik.chess_server.db.dao.UserInfoDAO
-//import dev.ky3he4ik.chess_server.models.problems.ProblemInfo
-//import dev.ky3he4ik.chess_server.security.services.JWTUtils
-//import dev.ky3he4ik.chess_server.security.services.MyUserDetailsService
-//import org.springframework.beans.factory.annotation.Autowired
-//import org.springframework.http.ResponseEntity
-//import org.springframework.security.authentication.AuthenticationManager
-//import org.springframework.security.core.Authentication
-//import org.springframework.security.crypto.password.PasswordEncoder
-//import org.springframework.web.bind.annotation.GetMapping
-//import org.springframework.web.bind.annotation.RestController
-//
-//@RestController
-//class ProblemsController {
-//    @Autowired
-//    private lateinit var authenticationManager: AuthenticationManager
-//
-//    @Autowired
-//    private lateinit var passwordEncoder: PasswordEncoder
-//
-//    @Autowired
-//    private lateinit var userDetailsService: MyUserDetailsService
-//
-//    @Autowired
-//    private lateinit var jwtUtils: JWTUtils
-//
-//    @Autowired
-//    private lateinit var userCredentialsDAO: UserCredentialsDAO
-//
-//    @Autowired
-//    private lateinit var userInfoDAO: UserInfoDAO
-//
-//    @Autowired
-//    private lateinit var problemInfoDAO: ProblemInfoDAO
-//
-//
-//
-//    @GetMapping("/problems/random")
-//    fun getRandomProblem(authentication: Authentication): ResponseEntity<ProblemInfo?> {
-//        val user = userCredentialsDAO.findByLoginLike(authentication.name)
-//
-//
-//
-//        runBlocking {
-//            val job = GlobalScope.launch {
-//                if (profile != null) {
-//                    val res = common.getProfileInfo(profile.authToken!!)
-//                    if (res.isSuccessful) {
-//                        result = ResponseEntity.ok(res.body())
-//                    }
-//                }
-//            }
-//            job.join()
-//        }
-//        return result
-//    }
-//
-//    @GetMapping("/problems/add")
-//    fun addProblem(authentication: Authentication): ResponseEntity<ProblemInfo?> {
-//        val user =
-//            authentication.name
-//        val profile: UserInfo? = authenticationManager.findByAuthTokenLike(authentication.name)
-//
-//        runBlocking {
-//            val job = GlobalScope.launch {
-//                if (profile != null) {
-//                    val res = common.getProfileInfo(profile.authToken!!)
-//                    if (res.isSuccessful) {
-//                        result = ResponseEntity.ok(res.body())
-//                    }
-//                }
-//            }
-//            job.join()
-//        }
-//        return result
-//    }
-//
-//    fun gatherRandomProblem(): ProblemInfo {
-//
-//    }
-//}
+
+import dev.ky3he4ik.chess_server.db.dao.ProblemInfoDAO
+import dev.ky3he4ik.chess_server.db.dao.UserCredentialsDAO
+import dev.ky3he4ik.chess_server.models.problems.ProblemInfo
+import dev.ky3he4ik.chess_server.network.chessblunders.ChessBlunders
+import dev.ky3he4ik.chess_server.operations.UserOperations
+import dev.ky3he4ik.chess_server.service.AuthService
+import dev.ky3he4ik.chess_server.util.Util
+import org.springframework.http.ResponseEntity
+import org.springframework.web.bind.annotation.*
+import java.util.*
+
+@RestController
+@RequestMapping("problems")
+class ProblemsController(
+    val userCredentialsDAO: UserCredentialsDAO,
+    val problemInfoDAO: ProblemInfoDAO,
+    val authService: AuthService,
+) {
+    @GetMapping("random")
+    fun getRandomProblem(
+        @RequestHeader("Login") login: String,
+        @RequestHeader("Token") token: String
+    ): ResponseEntity<ProblemInfo> {
+        val problem = gatherRandomProblem() ?: return ResponseEntity.internalServerError().build()
+        return ResponseEntity.ok(problem)
+    }
+
+    @GetMapping("unsolved")
+    fun getUnsolvedProblem(
+        @RequestHeader("Login") login: String,
+        @RequestHeader("Token") token: String
+    ): ResponseEntity<ProblemInfo> {
+        if (!authService.validateToken(login, token))
+            return Util.badRequest(401)
+        val uid = userCredentialsDAO.findByLoginLike(login)?.userId ?: return Util.badRequest(418)
+        val problemIds = problemInfoDAO.getRandomINotSolvedIds(uid)
+        if (problemIds.isEmpty())
+            return getRandomProblem(login, token)
+        return ResponseEntity.ok(problemInfoDAO.getById(problemIds[0]))
+    }
+
+    @PostMapping("add")
+    fun addProblem(
+        @RequestHeader("Login") login: String,
+        @RequestHeader("Token") token: String,
+        @RequestBody body: ProblemInfo
+    ): ResponseEntity<ProblemInfo> {
+        if (!authService.validateToken(login, token))
+            return Util.badRequest(401)
+        val userCredentials = userCredentialsDAO.findByLoginLike(login) ?: return Util.badRequest(418)
+        if (UserOperations.canAddProblems(userCredentials)) {
+            body.authorId = userCredentials.userId
+            return ResponseEntity.ok(problemInfoDAO.save(body))
+        }
+        return ResponseEntity.status(403).build()
+    }
+
+    @GetMapping("remove/{id}")
+    fun removeProblem(
+        @PathVariable id: UUID,
+        @RequestHeader("Login") login: String,
+        @RequestHeader("Token") token: String,
+    ): ResponseEntity<Boolean> {
+        if (!authService.validateToken(login, token))
+            return Util.badRequest(401)
+        val userCredentials = userCredentialsDAO.findByLoginLike(login) ?: return Util.badRequest(418)
+        if (UserOperations.canDeleteProblems(userCredentials)) {
+            problemInfoDAO.deleteById(id)
+            return ResponseEntity.ok(true)
+        }
+        return ResponseEntity.status(403).build()
+    }
+
+    fun gatherRandomProblem(): ProblemInfo? {
+        return problemInfoDAO.save(ChessBlunders.getRandomProblem() ?: return null)
+    }
+}

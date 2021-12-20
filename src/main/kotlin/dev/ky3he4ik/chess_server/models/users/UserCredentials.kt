@@ -17,11 +17,13 @@ class UserCredentials(
     @Column(nullable = false)
     var password: String? = null,
     @Column
+    var token: String? = null,
+    @Column
     var role: Role = Role.USER,
     @OneToOne
     @JoinColumn(name = "userId", nullable = false)
     @JsonManagedReference
-    var user: UserInfo = UserInfo()
+    var user: UserInfo? = UserInfo()
 ) {
     enum class Role {
         ADMIN, MODERATOR, PREMIUM, USER
